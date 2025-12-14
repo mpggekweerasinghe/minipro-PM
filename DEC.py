@@ -100,3 +100,35 @@ def run_simulation(interarrival_times, workers_per_dock, service_times):
         "throughput": metrics.completed / SIM_TIME,
         "utilization": utilization * 100
     }
+
+def experiment(interarrival_times, workers_per_dock, service_times):
+    results = [
+        run_simulation(interarrival_times, workers_per_dock, service_times)
+        for _ in range(REPLICATIONS)
+    ]
+
+    return {
+        "waiting": statistics.mean(r["waiting"] for r in results),
+        "queue": statistics.mean(r["queue"] for r in results),
+        "throughput": statistics.mean(r["throughput"] for r in results),
+        "utilization": statistics.mean(r["utilization"] for r in results)
+    }
+
+
+def print_header():
+    print("\n" + "=" * 68)
+    print("DAMBULLA ECONOMIC CENTRE – DATA-CALIBRATED SIMULATION")
+
+    print("System: 30-Dock Section (Avg. 26 Active Docks)")
+    print("Simulation Horizon: 8 Hours (480 Minutes)")
+    print("=" * 68)
+
+
+def print_block(title, results):
+    print("\n" + "-" * 68)
+    print(f"SCENARIO: {title}")
+    print("-" * 68)
+    print(f"{'Mean Waiting Time':32s}: {results['waiting']:.2f} minutes")
+    print(f"{'Mean Queue Length':32s}: {results['queue']:.2f} farmers")
+    print(f"{'Throughput':32s}: {results['throughput']:.2f} farmers/min")
+    print(f"{'Dock Utilization':32s}: {results['utilization']:.2f} %")
