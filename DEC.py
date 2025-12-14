@@ -66,3 +66,37 @@ def farmer(env, docks, metrics, service_times):
 
         metrics.busy_time += env.now - start
         metrics.completed += 1
+
+# =====================================================
+# 4. ARRIVAL PROCESS
+# =====================================================
+
+def arrival_generator(env, docks, metrics, interarrival_times, service_times):
+    for _ in range(FARMERS_PER_DAY):
+        env.process(farmer(env, docks, metrics, service_times))
+        yield env.timeout(random.choice(interarrival_times))
+
+
+def run_simulation(interarrival_times, workers_per_dock, service_times):
+    env = simpy.Environment()
+
+    capacity_per_dock = workers_per_dock // WORKERS_REQUIRED_PER_FARMER
+    total_capacity = capacity_per_dock * ACTIVE_DOCKS
+
+    docks = simpy.Resource(env, capacity=total_capacity)
+    metrics = Metrics()
+
+    env.process(arrival_generator(
+        env, docks, metrics, interarrival_times, service_times
+    ))
+
+    env.run(until=SIM_TIME)
+
+    utilization = metrics.busy_time / (total_capacity * SIM_TIME)
+
+    return {
+        "waiting": statistics.mean(metrics.waiting_times),
+        "queue": statistics.mean(metrics.queue_lengths),
+        "throughput": metrics.completed / SIM_TIME,
+        "utilization": utilization * 100
+    }
