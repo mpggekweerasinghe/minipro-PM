@@ -132,3 +132,33 @@ def print_block(title, results):
     print(f"{'Mean Queue Length':32s}: {results['queue']:.2f} farmers")
     print(f"{'Throughput':32s}: {results['throughput']:.2f} farmers/min")
     print(f"{'Dock Utilization':32s}: {results['utilization']:.2f} %")
+
+if __name__ == "__main__":
+
+    print_header()
+
+    # -------- BASELINE --------
+    baseline = experiment(
+        EMPIRICAL_INTERARRIVALS,
+        BASE_WORKERS_PER_DOCK,
+        BASE_SERVICE_TIMES
+    )
+    print_block("BASELINE (2 WORKERS, EMPIRICAL SERVICE)", baseline)
+
+    # -------- MORE STAFF --------
+    more_staff = experiment(
+        EMPIRICAL_INTERARRIVALS,
+        MORE_WORKERS_PER_DOCK,
+        FAST_SERVICE_TIMES
+    )
+    print_block("MORE STAFF (4 WORKERS, FASTER SERVICE)", more_staff)
+
+    # -------- ARRIVAL SMOOTHING --------
+    smoothed_interarrivals = [x * 2 for x in EMPIRICAL_INTERARRIVALS]
+
+    smoothing = experiment(
+        smoothed_interarrivals,
+        BASE_WORKERS_PER_DOCK,
+        BASE_SERVICE_TIMES
+    )
+    print_block("ARRIVAL SMOOTHING (CONTROLLED ARRIVALS)", smoothing)
