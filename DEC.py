@@ -114,7 +114,6 @@ def experiment(interarrival_times, workers_per_dock, service_times):
         "utilization": statistics.mean(r["utilization"] for r in results)
     }
 
-
 def print_header():
     print("\n" + "=" * 68)
     print("DAMBULLA ECONOMIC CENTRE – DATA-CALIBRATED SIMULATION")
