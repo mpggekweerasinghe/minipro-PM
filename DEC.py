@@ -42,3 +42,27 @@ class Metrics:
         self.queue_lengths = []
         self.busy_time = 0.0
         self.completed = 0
+
+# =====================================================
+# 3. FARMER PROCESS
+# =====================================================
+
+def farmer(env, docks, metrics, service_times):
+    arrival_time = env.now
+    metrics.queue_lengths.append(len(docks.queue))
+
+    with docks.request() as request:
+        yield request
+
+        wait = env.now - arrival_time
+        metrics.waiting_times.append(wait)
+
+        # Setup / coordination delay
+        yield env.timeout(SETUP_DELAY)
+
+        service_time = random.choice(service_times)
+        start = env.now
+        yield env.timeout(service_time)
+
+        metrics.busy_time += env.now - start
+        metrics.completed += 1
