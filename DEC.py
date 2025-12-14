@@ -32,3 +32,13 @@ MORE_WORKERS_PER_DOCK = 4
 # Coordination / setup delay (realistic)
 SETUP_DELAY = 3
 
+# =====================================================
+# 2. METRICS CLASS
+# =====================================================
+
+class Metrics:
+    def __init__(self):
+        self.waiting_times = []
+        self.queue_lengths = []
+        self.busy_time = 0.0
+        self.completed = 0
